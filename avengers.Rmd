@@ -1,0 +1,97 @@
+---
+title: "Avengers"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+av <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/avengers/avengers.csv", stringsAsFactors = FALSE)
+av
+```
+```{r}
+#attempt #1
+library(tidyverse)
+time <- parse_number(c("Death1", "Death2", "Death3", "Death4", "Death5"))
+time
+av
+```
+```{r}
+#attempt 2
+parse_number(x, na = c("Death1", "Death2", "Death3", "Death4", "Death5", "NA"), locale = default_locale(), trim_ws = TRUE)
+
+col_number()
+```
+```{r}
+#attempt 3
+av['time'] <- av[c("Death1", "Death2", "Death3", "Death4", "Death5")]
+```
+
+```{r}
+av['time'] <- av['Death1', 'Death2', ]
+
+
+
+# Replace one column with anohter column
+df['address'] <- df['work_address']
+df
+# Create new column from existing column
+df['id'] <- df['id'] * 5
+df
+
+av
+```
+
+```{r}
+x_num1 <- as.numeric("Death1")
+x_num2 <- as.numeric("Death2")
+x_num3 <- as.numeric("Death3")
+x_num4 <- as.numeric("Death4")
+x_num5 <- as.numeric("Death5")
+time <- parse_number(c("Death1", "Death2", "Death3", "Death4", "Death5"))
+#defining time
+time = av[c("Death1", "Death2", "Death3", "Death4", "Death5")]
+
+#adding column
+av$time = time
+#parse
+time <- parse_number(c("Death1", "Death2", "Death3", "Death4", "Death5"))
+# Join on multiple columns
+av2 <- av %>% merge(av, 
+        by=c('Death1', 'Death2'='time'))
+av2
+
+
+# R join multiple columns
+df2 <- merge(x=emp_df,y=dept_df, by.x=c("dept_id","dept_branch_id"), 
+      by.y=c("dept_id","dept_branch_id"))
+df2
+```
+This one could be it
+```{r}
+library(tidyr)
+# Select the columns for Death[1-5] and transform them into a long format
+deaths_long <- av %>%
+  select(starts_with("Death")) %>%
+  pivot_longer(cols = everything(), names_to = "Time", values_to = "Death") %>%
+  mutate(Time = parse_number(Time))
+
+# Map the values of "Death" to "yes", "no", or ""
+deaths_long$Death <- case_when(
+  deaths_long$Death == 1 ~ "yes",
+  deaths_long$Death == 0 ~ "no",
+  TRUE ~ ""
+)
+
+# Aggregate the data by "Time" and "Death"
+deaths <- deaths_long %>%
+  group_by(Time, Death) %>%
+  summarize(count = n())
+
+
+deaths
+```
+
